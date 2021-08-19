@@ -132,6 +132,12 @@ def get_temps_4_date_range(start,end, csv_folder, pkl = False):
     return temps_arr
 
 
+def get_temps_4_date_pkl(date):
+    return get_temps_4_date(date,'',pkl = True)
+
+
+def get_temps_4_date_range_pkl(start,end):
+    return get_temps_4_date_range(start,end,'',pkl=True)
 
 
 if __name__ == '__main__':
@@ -151,9 +157,9 @@ if __name__ == '__main__':
     '''
     #soil_dict, air_dict = construct_temp_dicts('Temperature Data')
     #pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
-    test_date = datetime.date(2019, 1, 1)
-    test_datee = datetime.date(2019, 1, 10)
-    print(get_temps_4_date(test_date,'Temperature Data',pkl = True))
-    print(get_temps_4_date_range(test_date,test_datee,'Temperature Data',pkl = True))
+    #test_date = datetime.date(2019, 1, 1)
+    #test_datee = datetime.date(2019, 1, 10)
+    #print(get_temps_4_date(test_date,'Temperature Data',pkl = True))
+    #print(get_temps_4_date_range(test_date,test_datee,'Temperature Data',pkl = True))
 
 

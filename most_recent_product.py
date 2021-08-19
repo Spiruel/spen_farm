@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import glob
-from tqdm import tqdm
+import pickle
 
 
 def closest_date(date_list, date):
@@ -41,8 +41,11 @@ def field_closest_date(field_id,field_df_dict,date):
     return closest
 
 
-def field_closest_product_2_date(field_name_or_id,date,csv_path,name=True):
-    field_df_dict, field_id_dict = construct_field_dicts(csv_path)
+def field_closest_product_2_date(field_name_or_id,date,csv_path,name=True,pkl = False):
+    if not pkl:
+        field_df_dict, field_id_dict = construct_field_dicts(csv_path)
+    else:
+        (field_df_dict, field_id_dict) = pickle.load(open('field_inputs.pkl','rb'))
 
     if name:
         field_id = field_id_dict[field_name_or_id]
@@ -63,11 +66,16 @@ def field_closest_product_2_date(field_name_or_id,date,csv_path,name=True):
 
     return date_applied, product, rate_per_ha, units, len(product)
 
+def field_closest_product_2_date_pkl(field_id,date):
+    return field_closest_product_2_date(field_id,date,'',name = False,pkl = True)
 
 if __name__ == '__main__':
-    path = "Field_Inputs/csv fields"
 
-    date_applied, product, rate_per_ha, units, len = field_closest_product_2_date("0412","10/5/2018",path,name=False)
+    path = "Field_Inputs/csv fields"
+    #(field_df_dict,field_id_dict) = construct_field_dicts(path)
+    #pickle.dump((field_df_dict,field_id_dict), open("field_inputs.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
+
+    date_applied, product, rate_per_ha, units, len = field_closest_product_2_date("0412","10/5/2018",path,name=False,pkl=True)
 
     for i in range(len):
         print(f"{rate_per_ha[i]} {units[i]} per ha of {product[i]} was applied on {date_applied}")
