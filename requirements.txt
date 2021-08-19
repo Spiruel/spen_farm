@@ -55,7 +55,7 @@ googleapis-common-protos~=1.53.0
 googledrivedownloader~=0.4
 httplib2~=0.19.1
 httplib2shim~=0.0.3
-idna~=3.2~=3.2
+idna~=3.2
 infi.clickhouse-orm~=2.1.0
 ipyevents~=2.0.1
 ipyfilechooser~=0.4.4
@@ -63,7 +63,7 @@ ipykernel~=6.0.3
 ipyleaflet~=0.14.0
 ipynb-py-convert~=0.4.6
 ipython~=7.26.0
-ipython-genutils
+ipython-genutils~=0.2.0
 ipytree~=0.2.1
 ipywidgets~=7.6.3
 iso8601~=0.1.16
