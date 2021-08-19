@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import glob
 import datetime
-from tqdm import tqdm
+import pickle
 
 def construct_temp_dicts(csv_folder_path):
     all_soil_csvs = glob.iglob(csv_folder_path + "/Soil Temp/*.csv")
@@ -37,9 +37,13 @@ def daily_air_temp(date,air_df):
     return max_temp_mean,min_temp_mean
 
 
-def get_temps_4_date(date,csv_folder):
-    download_data(range(1959,2020),csv_folder)
-    soil_dict, air_dict = construct_temp_dicts(csv_folder)
+def get_temps_4_date(date,csv_folder,pkl = False):
+    if not pkl:
+        download_data(range(1959,2020),csv_folder)
+        soil_dict, air_dict = construct_temp_dicts(csv_folder)
+    else:
+        (soil_dict, air_dict) = pickle.load(open("temperature_dict.pkl",'rb'))
+
     try:
         soil_df = soil_dict[str(date.year)]
         soil_df = soil_df[:-1]
@@ -57,9 +61,12 @@ def get_temps_4_date(date,csv_folder):
     return soil_10_cm_mean,max_temp_mean,min_temp_mean
 
 
-def get_temps_4_date_range(start,end, csv_folder):
-    download_data(range(1959,2020),csv_folder)
-    soil_dict, air_dict = construct_temp_dicts(csv_folder)
+def get_temps_4_date_range(start,end, csv_folder, pkl = False):
+    if not pkl:
+        download_data(range(1959,2020),csv_folder)
+        soil_dict, air_dict = construct_temp_dicts(csv_folder)
+    else:
+        (soil_dict,air_dict) = pickle.load(open("temperature_dict.pkl",'rb'))
 
     dd = [start + datetime.timedelta(days=x) for x in range((end - start).days + 1)]
 
@@ -125,7 +132,10 @@ def get_temps_4_date_range(start,end, csv_folder):
     return temps_arr
 
 
+
+
 if __name__ == '__main__':
+    '''
     test_date = datetime.date(2019,1,1)
     end = datetime.date(2019,2,21)
     date1 = datetime.date(2017,2,26)
@@ -138,5 +148,12 @@ if __name__ == '__main__':
     print(get_temps_4_date_range(start,end,'Temperature Data').shape)
     dd = np.array([start + datetime.timedelta(days=x) for x in range((end - start).days + 1)])
     print(dd.shape)
+    '''
+    #soil_dict, air_dict = construct_temp_dicts('Temperature Data')
+    #pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
+    test_date = datetime.date(2019, 1, 1)
+    test_datee = datetime.date(2019, 1, 10)
+    print(get_temps_4_date(test_date,'Temperature Data',pkl = True))
+    print(get_temps_4_date_range(test_date,test_datee,'Temperature Data',pkl = True))
 
 
