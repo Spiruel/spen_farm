@@ -41,8 +41,12 @@ def construct_rain_dicts(csv_folder):
     return df_dict
 
 
-def get_rain_4_date(date, csv_folder):
-    df_dict = construct_rain_dicts(csv_folder)
+def get_rain_4_date(date, csv_folder,pkl = False):
+    if not pkl:
+        df_dict = construct_rain_dicts(csv_folder)
+    else:
+        df_dict = pickle.load(open("rain_dict.pkl", 'rb'))
+
     try:
         df = df_dict[str(date.year)]
         return df[pd.to_datetime(df['ob_date']).dt.date == date]['prcp_amt'].values[0]
@@ -50,8 +54,12 @@ def get_rain_4_date(date, csv_folder):
         return np.NaN
 
 
-def get_rain_4_date_range(start,end,csv_folder):
-    df_dict = construct_rain_dicts(csv_folder)
+def get_rain_4_date_range(start,end,csv_folder,pkl = False):
+    if not pkl:
+        df_dict = construct_rain_dicts(csv_folder)
+    else:
+        df_dict = pickle.load(open("rain_dict.pkl", 'rb'))
+
 
     if start.year == end.year:
         try:
@@ -88,12 +96,17 @@ def get_rain_4_date_range(start,end,csv_folder):
         rain_arr = rain_arr[1:]
     return rain_arr
 
+def get_rain_4_date_pkl(date):
+    return get_rain_4_date(date,'',True)
+
+def get_rain_4_date_range_pkl(start,end):
+    return get_rain_4_date_range(start,end,'',True)
 
 if __name__ == '__main__':
 
-    start = datetime.date(2004,1,1)
-    end = datetime.date(2005,1,1)
-    print(get_rain_4_date_range(start,end,'Rain Data'))
+    #start = datetime.date(2004,1,1)
+    #end = datetime.date(2005,1,1)
+    #print(get_rain_4_date_range(start,end,'Rain Data'))
     #test = datetime.date(2000,11,1)
     #print(get_rain_4_date(test,'Rain Data'))
     #print(np.isnan(get_rain_4_date(test,'Rain Data')))
