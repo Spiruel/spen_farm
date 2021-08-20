@@ -40,28 +40,13 @@ def construct_rain_dicts(csv_folder):
     return df_dict
 
 
-def daily_rainfall(date,df, hourly_bool):
-    if not hourly_bool:
-        daily_rain = df[pd.to_datetime(df['ob_date']).dt.date == date]['prcp_amt'].values[0]
-    else:
-        daily_rain = df[pd.to_datetime(df['ob_end_time']).dt.date == date]['prcp_amt'].sum()
-    return daily_rain
-
-
 def get_rain_4_date(date, csv_folder):
-    daily_dict, hourly_dict = construct_rain_dicts(csv_folder)
-    if date.year < 2001:
-        try:
-            df = daily_dict[str(date.year)]
-            return daily_rainfall(date,df,False)
-        except KeyError:
-            return np.NaN
-    else:
-        try:
-            df = hourly_dict[str(date.year)]
-            return daily_rainfall(date,df,True)
-        except KeyError:
-            return np.NaN
+    df_dict = construct_rain_dicts(csv_folder)
+    try:
+        df = df_dict[str(date.year)]
+        return df[pd.to_datetime(df['ob_date']).dt.date == date]['prcp_amt'].values[0]
+    except KeyError:
+        return np.NaN
 
 
 def get_rain_4_date_range(start,end,csv_folder):
@@ -106,7 +91,10 @@ def get_rain_4_date_range(start,end,csv_folder):
 if __name__ == '__main__':
     start = datetime.date(2004,1,1)
     end = datetime.date(2005,1,1)
-    print(get_rain_4_date_range(start,end,'Rain Data'))
+    #print(get_rain_4_date_range(start,end,'Rain Data'))
+    test = datetime.date(2000,11,1)
+    print(get_rain_4_date(test,'Rain Data'))
+    print(np.isnan(get_rain_4_date(test,'Rain Data')))
 
 
 
