@@ -147,7 +147,7 @@ def get_temps_4_date_range_pkl(start,end):
 
 
 if __name__ == '__main__':
-
+    '''
     test_date = datetime.date(2012,3,20)
     end = datetime.date(2014,2,6)
     date1 = datetime.date(2012,2,26)
@@ -161,8 +161,8 @@ if __name__ == '__main__':
     dd = np.array([start + datetime.timedelta(days=x) for x in range((end - start).days + 1)])
     print(dd.shape)
     '''
-    #soil_dict, air_dict = construct_temp_dicts('Temperature Data')
-    #pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
+    soil_dict, air_dict = construct_temp_dicts('Temperature Data')
+    pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
     #test_date = datetime.date(2019, 1, 1)
     #test_datee = datetime.date(2019, 1, 10)
     #print(get_temps_4_date(test_date,'Temperature Data',pkl = True))

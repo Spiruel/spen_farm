@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import glob
 import datetime
+import pickle
 
 def construct_rain_dicts(csv_folder):
     all_daily_csvs = glob.iglob(csv_folder + "/Daily/*.csv")
@@ -89,13 +90,16 @@ def get_rain_4_date_range(start,end,csv_folder):
 
 
 if __name__ == '__main__':
+
     start = datetime.date(2004,1,1)
     end = datetime.date(2005,1,1)
-    #print(get_rain_4_date_range(start,end,'Rain Data'))
-    test = datetime.date(2000,11,1)
-    print(get_rain_4_date(test,'Rain Data'))
-    print(np.isnan(get_rain_4_date(test,'Rain Data')))
+    print(get_rain_4_date_range(start,end,'Rain Data'))
+    #test = datetime.date(2000,11,1)
+    #print(get_rain_4_date(test,'Rain Data'))
+    #print(np.isnan(get_rain_4_date(test,'Rain Data')))
 
+    #rain_dict = construct_rain_dicts('Rain Data')
+    #pickle.dump(rain_dict, open("rain_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
 
 
     
