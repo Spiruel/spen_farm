@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-import glob
 import datetime
-
+import pickle
 
 def get_cosmos_df(csv):
     df = pd.read_csv(csv)
@@ -16,8 +15,11 @@ def get_cosmos_df(csv):
     return df
 
 
-def get_cosmos_col_4_date(col,date,csv):
-    df = get_cosmos_df(csv)
+def get_cosmos_col_4_date(col,date,csv,pkl = False):
+    if not pkl:
+        df = get_cosmos_df(csv)
+    else:
+        df = pickle.load(open("cosmos_df.pkl", 'rb'))
     try:
         val = df[df['DATE_TIME'].dt.date == date][col].values[0]
         if val == -9999:
@@ -28,8 +30,11 @@ def get_cosmos_col_4_date(col,date,csv):
         return np.NaN
 
 
-def get_cosmos_col_4_date_range(col,start,end,csv):
-    df = get_cosmos_df(csv)
+def get_cosmos_col_4_date_range(col,start,end,csv,pkl = False):
+    if not pkl:
+        df = get_cosmos_df(csv)
+    else:
+        df = pickle.load(open("cosmos_df.pkl", 'rb'))
 
     if start.year == end.year:
 
@@ -66,10 +71,21 @@ def get_cosmos_col_4_date_range(col,start,end,csv):
 
     return cos_arr
 
+
+def get_cosmos_col_4_date_pkl(col,date):
+    return get_cosmos_col_4_date(col,date,'',True)
+
+
+def get_cosmos_col_4_date_range_pkl(col,start,end):
+    return get_cosmos_col_4_date_range(col,start,end,'',True)
+
+
 if __name__ == '__main__':
     csv = "COSMOS-UK_SPENF_HydroSoil_Daily_2013-2019.csv"
 
-
+    #df = get_cosmos_df(csv)
+    #pickle.dump(df, open("cosmos_df.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
+    '''
     date = datetime.date(3000,8,1)
 
     start = datetime.date(2016,11,22)
@@ -77,3 +93,4 @@ if __name__ == '__main__':
     #print(get_cosmos_col_4_date('COSMOS_VWC',date,csv))
     #print(get_cosmos_col_4_date('ALBEDO', date, csv))
     print(get_cosmos_col_4_date_range('ALBEDO',start,end,csv))
+    '''

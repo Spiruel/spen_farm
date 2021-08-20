@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import glob
 import datetime
+import pickle
 
 
 def construct_sol_dict(csv_folder):
@@ -25,8 +26,12 @@ def construct_sol_dict(csv_folder):
         df_dict[year] = df
     return df_dict
 
-def get_sol_4_date(date, csv_folder):
-    df_dict = construct_sol_dict(csv_folder)
+def get_sol_4_date(date, csv_folder,pkl = False):
+    if not pkl:
+        df_dict = construct_sol_dict(csv_folder)
+    else:
+        df_dict = pickle.load(open("sol_dict.pkl", 'rb'))
+
     try:
         df = df_dict[str(date.year)]
         return df[pd.to_datetime(df['ob_date']).dt.date == date]['glbl_irad_amt'].values[0]
@@ -35,9 +40,12 @@ def get_sol_4_date(date, csv_folder):
 
 
 
-def get_sol_4_date_range(start, end, csv_folder):
-    df_dict = construct_sol_dict(csv_folder)
-    
+def get_sol_4_date_range(start, end, csv_folder,pkl = False):
+    if not pkl:
+        df_dict = construct_sol_dict(csv_folder)
+    else:
+        df_dict = pickle.load(open("sol_dict.pkl", 'rb'))
+
     if start.year == end.year:
         try:
             df = df_dict[str(start.year)]
@@ -72,11 +80,20 @@ def get_sol_4_date_range(start, end, csv_folder):
             sol_arr = np.concatenate((sol_arr,y_sol_arr))
         sol_arr = sol_arr[1:]
     return sol_arr
-    
-    
-    
+
+
+def get_sol_4_date_pkl(date):
+    return get_sol_4_date(date,'',True)
+
+
+def get_sol_4_date_range_pkl(start,end):
+    return get_sol_4_date_range(start,end,'',True)
+
+
 if __name__=='__main__':
     date = datetime.date(2019,1,1)
     date2 = datetime.date(2018,1,1)
+    #sol_dict = construct_sol_dict('Solar Data')
+    #pickle.dump(sol_dict, open("sol_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
 
 
