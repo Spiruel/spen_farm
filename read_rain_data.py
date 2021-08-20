@@ -104,7 +104,7 @@ def get_rain_4_date_range_pkl(start,end):
 
 if __name__ == '__main__':
 
-    #start = datetime.date(2004,1,1)
+    start = datetime.date(2004,1,1)
     #end = datetime.date(2005,1,1)
     #print(get_rain_4_date_range(start,end,'Rain Data'))
     #test = datetime.date(2000,11,1)
