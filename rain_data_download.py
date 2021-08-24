@@ -50,5 +50,5 @@ def download_rain_data_full(year_range, save_folder):
 
 if __name__ == '__main__':
     #download_rain('Rain Data')
-    year_range = range(1959,2022)
+    year_range = range(1961,2022)
     download_rain_data_full(year_range,'Full Rain Data')
