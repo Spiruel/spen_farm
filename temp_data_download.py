@@ -45,3 +45,32 @@ def download_data(year_range,save_folder):
         print("Download finished!", end = '\r')
         print('                                 ', end = '\r')
 
+
+def download_soil_temp_full(year,save_folder):
+    url = f"https://dap.ceda.ac.uk/badc/ukmo-midas/data/ST/yearly_files/midas_soiltemp_{year}01-{year}12.txt"
+    download_file(url, save_folder)
+
+
+def download_air_temp_full(year,save_folder):
+    url = f"https://dap.ceda.ac.uk/badc/ukmo-midas/data/TD/yearly_files/midas_tempdrnl_{year}01-{year}12.txt"
+    download_file(url,save_folder)
+
+
+def download_temp_data_full(year_range,save_folder):
+    soil_folder = os.path.join(save_folder, "Full Soil Temp")
+    air_folder = os.path.join(save_folder, "Full Air Temp")
+
+    os.makedirs(soil_folder)
+    os.makedirs(air_folder)
+
+    for year in tqdm(year_range):
+        download_soil_temp_full(year,soil_folder)
+        download_air_temp_full(year,air_folder)
+
+
+if __name__ == '__main__':
+    year_range = range(1959,2022)
+    download_temp_data_full(year_range,'Full Temperature Data')
+
+
+

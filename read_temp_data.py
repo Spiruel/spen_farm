@@ -5,6 +5,7 @@ import glob
 import datetime
 import pickle
 
+
 def construct_temp_dicts(csv_folder_path):
     all_soil_csvs = glob.iglob(csv_folder_path + "/Soil Temp/*.csv")
     all_air_csvs = glob.iglob(csv_folder_path + "/Air Temp/*.csv")
