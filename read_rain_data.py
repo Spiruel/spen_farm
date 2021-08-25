@@ -191,7 +191,7 @@ def construct_rain_dicts_full(full_temp_path):
     
 if __name__ == '__main__':
 
-    #start = datetime.date(2003,1,1)
+    start = datetime.date(2003,1,1)
     #print(get_rain_4_date(start,'Rain Data',False))
     #print(get_rain_4_date(start, '',True))
     #end = datetime.date(2004,1,1)
