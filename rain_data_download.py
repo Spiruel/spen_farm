@@ -26,5 +26,29 @@ def download_rain(save_folder):
     for year in tqdm(hourly_year_range):
         download_hourly_rain(year,hourly_folder)
 
+
+def download_daily_rain_full(year, save_folder):
+    url = f"https://dap.ceda.ac.uk/badc/ukmo-midas/data/RD/yearly_files/midas_raindrnl_{year}01-{year}12.txt"
+    download_file(url, save_folder)
+
+def download_hourly_rain_full(year, save_folder):
+    url = f"https://dap.ceda.ac.uk/badc/ukmo-midas/data/RH/yearly_files/midas_rainhrly_{year}01-{year}12.txt"
+    download_file(url, save_folder)
+
+
+def download_rain_data_full(year_range, save_folder):
+    daily_folder = os.path.join(save_folder, "Full Daily")
+    hourly_folder = os.path.join(save_folder, "Full Hourly")
+
+    os.makedirs(daily_folder)
+    os.makedirs(hourly_folder)
+
+    for year in tqdm(year_range):
+        download_daily_rain_full(year,daily_folder)
+        download_hourly_rain_full(year,hourly_folder)
+
+
 if __name__ == '__main__':
-    download_rain('Rain Data')
+    #download_rain('Rain Data')
+    year_range = range(1961,2022)
+    download_rain_data_full(year_range,'Full Rain Data')

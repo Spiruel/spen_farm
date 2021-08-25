@@ -4,6 +4,8 @@ import pandas as pd
 import glob
 import datetime
 import pickle
+from tqdm import tqdm
+
 
 def construct_temp_dicts(csv_folder_path):
     all_soil_csvs = glob.iglob(csv_folder_path + "/Soil Temp/*.csv")
@@ -59,7 +61,7 @@ def get_temps_4_date(date,csv_folder,pkl = False):
         download_data(range(1959,2020),csv_folder)
         soil_dict, air_dict = construct_temp_dicts(csv_folder)
     else:
-        (soil_dict, air_dict) = pickle.load(open("temperature_dict.pkl",'rb'))
+        (soil_dict, air_dict) = pickle.load(open("full_temperature_dict.pkl",'rb'))
 
     try:
         soil_df = soil_dict[str(date.year)]
@@ -80,7 +82,7 @@ def get_temps_4_date_range(start,end, csv_folder, pkl = False):
         download_data(range(1959,2020),csv_folder)
         soil_dict, air_dict = construct_temp_dicts(csv_folder)
     else:
-        (soil_dict,air_dict) = pickle.load(open("temperature_dict.pkl",'rb'))
+        (soil_dict,air_dict) = pickle.load(open("full_temperature_dict.pkl",'rb'))
 
     dd = [start + datetime.timedelta(days=x) for x in range((end - start).days + 1)]
 
@@ -146,6 +148,103 @@ def get_temps_4_date_range_pkl(start,end):
     return get_temps_4_date_range(start,end,'',pkl=True)
 
 
+def read_soil_temp_full(soil_file):
+    df = pd.read_csv(soil_file, header=0, low_memory = False, names=['id',
+                                                'id_type',
+                                                'ob_time',
+                                                'met_domain_name',
+                                                'version_num',
+                                                'src_id',
+                                                'rec_st_ind',
+                                                'q5cm_soil_temp',
+                                                'q10cm_soil_temp',
+                                                'q20cm_soil_temp',
+                                                'q30cm_soil_temp',
+                                                'q50cm_soil_temp',
+                                                'q100cm_soil_temp',
+                                                'q5cm_soil_temp_q',
+                                                'q10cm_soil_temp_q',
+                                                'q20cm_soil_temp_q',
+                                                'q30cm_soil_temp_q',
+                                                'q50cm_soil_temp_q',
+                                                'q100cm_soil_temp_q',
+                                                'meto_stmp_time',
+                                                'midas_stmp_etime',
+                                                'q5cm_soil_temp_j',
+                                                'q10cm_soil_temp_j',
+                                                'q20cm_soil_temp_j',
+                                                'q30cm_soil_temp_j',
+                                                'q50cm_soil_temp_j',
+                                                'q100cm_soil_temp_j'])
+    df = df[df.version_num == 1]
+    df = df[df.src_id == 534][['ob_time','q10cm_soil_temp']]
+    df['q10cm_soil_temp'] = pd.to_numeric(df['q10cm_soil_temp'], errors='coerce')
+    return df
+
+
+def read_air_temp_full(air_file):
+    df = pd.read_csv(air_file, header=0, low_memory=False, names=['ob_end_time',
+                                                 'id_type',
+                                                 'id',
+                                                 'ob_hour_count',
+                                                 'version_num',
+                                                 'met_domain_name',
+                                                 'src_id',
+                                                 'rec_st_ind',
+                                                 'max_air_temp',
+                                                 'min_air_temp',
+                                                 'min_grss_temp',
+                                                 'min_conc_temp_',
+                                                 'max_air_temp_q',
+                                                 'min_air_temp_q',
+                                                 'min_grss_temp_q',
+                                                 'min_conc_temp_q',
+                                                 'meto_stmp_time',
+                                                 'midas_stmp_etime',
+                                                 'max_air_temp_j',
+                                                 'min_air_temp_j',
+                                                 'min_grss_temp_j',
+                                                 'min_conc_temp_j', ])
+
+    df = df[df.version_num == 1]
+    df = df[df.src_id == 534][['ob_end_time','max_air_temp','min_air_temp']]
+    df['max_air_temp'] = pd.to_numeric(df['max_air_temp'], errors='coerce')
+    df['min_air_temp'] = pd.to_numeric(df['min_air_temp'], errors='coerce')
+    return df
+
+def construct_temp_dicts_full(full_temp_path):
+    all_soil_files = glob.iglob(full_temp_path + "/Full Soil Temp/*.txt")
+    all_air_files = glob.iglob(full_temp_path + "/Full Air Temp/*.txt")
+
+    full_soil_df_dict = {}
+
+    full_air_df_dict = {}
+
+    for soil_file, air_file in tqdm(zip(all_soil_files, all_air_files),total = 63):
+        year = soil_file.split('.')[0][-6:-2]
+
+        soil_df = read_soil_temp_full(soil_file)
+
+        soil_df['ob_time'] = pd.to_datetime(soil_df['ob_time'])
+        soil_df = soil_df.resample('D', on='ob_time', ).mean()
+        ix = pd.date_range(datetime.date(int(year), 1, 1), datetime.date(int(year), 12, 31), freq='D')
+        soil_df = soil_df.reindex(ix)
+        soil_df = soil_df.reset_index(level=0).rename(columns={'index': 'ob_time'})
+
+        air_df = read_air_temp_full(air_file)
+
+        air_df['ob_end_time'] = pd.to_datetime(air_df['ob_end_time'])
+        air_df = air_df.resample('D', on='ob_end_time', ).mean()
+        ix = pd.date_range(datetime.date(int(year), 1, 1), datetime.date(int(year), 12, 31), freq='D')
+        air_df = air_df.reindex(ix)
+        air_df = air_df.reset_index(level=0).rename(columns={'index': 'ob_end_time'})
+
+        full_soil_df_dict[year] = soil_df
+        full_air_df_dict[year] = air_df
+
+    return full_soil_df_dict, full_air_df_dict
+
+
 if __name__ == '__main__':
     '''
     test_date = datetime.date(2012,3,20)
@@ -161,11 +260,16 @@ if __name__ == '__main__':
     dd = np.array([start + datetime.timedelta(days=x) for x in range((end - start).days + 1)])
     print(dd.shape)
     '''
-    soil_dict, air_dict = construct_temp_dicts('Temperature Data')
-    pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
+    #soil_dict, air_dict = construct_temp_dicts('Temperature Data')
+    #pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
     #test_date = datetime.date(2019, 1, 1)
     #test_datee = datetime.date(2019, 1, 10)
     #print(get_temps_4_date(test_date,'Temperature Data',pkl = True))
     #print(get_temps_4_date_range(test_date,test_datee,'Temperature Data',pkl = True))
-
+    #print(read_soil_temp_full("Full Temperature Data/Full Soil Temp/midas_soiltemp_195901-195912.txt"))
+    #df = read_air_temp_full("Full Temperature Data/Full Air Temp/midas_tempdrnl_200501-200512.txt")
+    soil_dict, air_dict = construct_temp_dicts_full('Full Temperature Data')
+    pickle.dump((soil_dict, air_dict), open("full_temperature_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
+    test_date1 = datetime.date(2019,3,2)
+    test_date2 = datetime.date(2021,1,3)
 
