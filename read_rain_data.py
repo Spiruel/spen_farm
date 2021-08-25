@@ -106,7 +106,7 @@ def get_rain_4_date_range_pkl(start,end):
 
 
 def read_hourly_rain_full(file):
-    df = pd.read_csv(file,header = 0, low_memory= False,index_col=False, on_bad_lines='skip',names = ['ob_end_time',
+    df = pd.read_csv(file,header = 0, low_memory= False,index_col=False,names = ['ob_end_time',
                                                                                'id',
                                                                                'id_type',
                                                                                'ob_hour_count',
@@ -199,7 +199,9 @@ if __name__ == '__main__':
     #print(get_rain_4_date_range(start,end,'',True))
 
     #print(get_rain_4_date(datetime.date(2003,12,31),'Rain Data',False))
-    print(get_rain_4_date_pkl(datetime.date(2021,1,1)))
+    #print(get_rain_4_date_pkl(datetime.date(2015,9,1)))
+    #df = read_hourly_rain_full("Full Rain Data/Full Hourly/midas_rainhrly_201501-201512.txt")
+
     #test = datetime.date(2000,11,1)
     #print(get_rain_4_date(test,'Rain Data'))
     #print(np.isnan(get_rain_4_date(test,'Rain Data')))
