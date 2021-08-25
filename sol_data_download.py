@@ -26,5 +26,5 @@ def download_sol_data_full(year_range,save_folder):
 
 if __name__ == '__main__':
     #download_sol_data('Solar Data')
-    year_range = range(1959,2022)
+    year_range = range(2001,2022)
     download_sol_data_full(year_range,'Full Solar Data')
