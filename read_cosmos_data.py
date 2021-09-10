@@ -13,11 +13,15 @@ def get_cosmos_df(csv):
     :param csv: filepath to csv
     :return:
     """
-    df = pd.read_csv(csv)
-    df = df[1:]
-    df['DATE_TIME'] = pd.to_datetime(df['DATE_TIME'])
+    names = pd.read_csv(csv, skiprows=3, nrows=0)
+    names = names.rename(columns={'parameter-id': 'DATE_TIME', 'COSMOS_VWC_1DAY': 'COSMOS_VWC',
+                                  'ALBEDO_DAILY_MEAN': 'ALBEDO'}).columns.values
+
+    df = pd.read_csv(csv, skiprows=5, header=0, index_col=False, dayfirst=True, names=names)
+    df['DATE_TIME'] = pd.to_datetime(df['DATE_TIME'], dayfirst=True)
     df = df.set_index('DATE_TIME')
-    ix = pd.date_range(datetime.date(int(2016), 1, 1), datetime.date(int(2019), 12, 31), freq='D')
+
+    ix = pd.date_range(datetime.date(int(2016), 1, 1), datetime.date(int(2021), 12, 31), freq='D')
     df = df.reindex(ix)
     df = df.reset_index(level=0).rename(columns={'index': 'DATE_TIME'})
     return df
@@ -120,7 +124,6 @@ def get_cosmos_col_4_date_range_pkl(col,start,end):
 
 
 if __name__ == '__main__':
-    csv = "COSMOS-UK_SPENF_HydroSoil_Daily_2013-2019.csv"
-
+    csv = "SPENF-2016-11-24-2021-09-05.csv"
     df = get_cosmos_df(csv)
     pickle.dump(df, open("cosmos_df.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
