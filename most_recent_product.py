@@ -1,21 +1,33 @@
+"""
+For a given date, gets most recent product applied from Field Inputs data
+"""
 import pandas as pd
-import numpy as np
 import datetime
 import glob
 import pickle
 
 
 def closest_date(date_list, date):
+    """
+    returns the closest date to date in date_list
+    :param date_list:
+    :param date:
+    :return:
+    """
     return min(date_list, key=lambda x: abs(x - date))
 
 
 def construct_field_dicts(csv_folder_path):
+    """
+    reads in field input data csvs and turns them into dicts of dataframes
+    :param csv_folder_path: file path to field input csvs
+    :return:
+    """
     path = csv_folder_path
     all_csvs = glob.iglob(path+ "/*.csv")
 
     field_df_dict = {}
     field_id_dict = {}
-
     for csv in all_csvs:
         df = pd.read_csv(csv)
         FieldDefinedName = df["Field.Defined.Name"][0]
@@ -35,6 +47,13 @@ def construct_field_dicts(csv_folder_path):
 
 
 def field_closest_date(field_id,field_df_dict,date):
+    """
+    For a given field, returns the closest date recorded to date
+    :param field_id: field id number
+    :param field_df_dict: dict of field dataframes
+    :param date: date to find closest to
+    :return:
+    """
     field_df = field_df_dict[field_id]
     field_dates = pd.to_datetime(field_df["Actual.Issued.Date"]).dt.date.tolist()
     closest = closest_date(field_dates,date)
@@ -42,6 +61,15 @@ def field_closest_date(field_id,field_df_dict,date):
 
 
 def field_closest_product_2_date(field_name_or_id,date,csv_path,name=True,pkl = False):
+    """
+    For a given field, returns the product(s) applied on the closest date to date
+    :param field_name_or_id: field name or id number
+    :param date: date to get closest product to
+    :param csv_path: file path to field input csvs
+    :param name: Bool: True if field_name_or_id is field name, False if field id number
+    :param pkl: Bool: True if field input data comes from .pkl instead of csvs
+    :return:
+    """
     if not pkl:
         field_df_dict, field_id_dict = construct_field_dicts(csv_path)
     else:
@@ -66,8 +94,16 @@ def field_closest_product_2_date(field_name_or_id,date,csv_path,name=True,pkl = 
 
     return date_applied, product, rate_per_ha, units, len(product)
 
+
 def field_closest_product_2_date_pkl(field_id,date):
+    """
+    For a field id number, gets the closest product applied to date
+    :param field_id: field id number
+    :param date: date
+    :return:
+    """
     return field_closest_product_2_date(field_id,date,'',name = False,pkl = True)
+
 
 if __name__ == '__main__':
 

@@ -1,3 +1,6 @@
+"""
+Reads MIDAS solar data and returns values for given date/date range
+"""
 import numpy as np
 import pandas as pd
 import glob
@@ -7,6 +10,11 @@ from tqdm import tqdm
 
 
 def construct_sol_dict(csv_folder):
+    """
+   Constructs dictionary of yearly solar data dataframes from csvs
+   :param csv_folder: file path to rain data csvs
+   :return:
+   """
     all_csvs = glob.iglob(csv_folder + "/*.csv")
     df_dict = {}
 
@@ -27,7 +35,15 @@ def construct_sol_dict(csv_folder):
         df_dict[year] = df
     return df_dict
 
+
 def get_sol_4_date(date, csv_folder,pkl = False):
+    """
+    Gets solar data for date
+    :param date: date
+    :param csv_folder: filepath to solar data csvs
+    :param pkl: Bool, True -> get dataframe dict from .pkl instead of csvs
+    :return:
+    """
     if not pkl:
         df_dict = construct_sol_dict(csv_folder)
     else:
@@ -40,8 +56,15 @@ def get_sol_4_date(date, csv_folder,pkl = False):
         return np.NaN
 
 
-
 def get_sol_4_date_range(start, end, csv_folder,pkl = False):
+    """
+    Gets solar data for date range
+    :param start: start of date range
+    :param end: end of data range
+    :param csv_folder: filepath to solar data csvs
+    :param pkl: Bool, True -> get dataframe dict from .pkl instead of csvs
+    :return:
+    """
     if not pkl:
         df_dict = construct_sol_dict(csv_folder)
     else:
@@ -84,14 +107,30 @@ def get_sol_4_date_range(start, end, csv_folder,pkl = False):
 
 
 def get_sol_4_date_pkl(date):
+    """
+    Gets solar data for date from .pkl
+    :param date:
+    :return:
+    """
     return get_sol_4_date(date,'',True)
 
 
 def get_sol_4_date_range_pkl(start,end):
+    """
+    Gets solar data for date from .pkl
+    :param start:
+    :param end:
+    :return:
+    """
     return get_sol_4_date_range(start,end,'',True)
 
 
 def read_sol_data_full(file):
+    """
+    Gets solar data dataframe from full MIDAS yearly .txt
+    :param file: file path to .txt
+    :return:
+    """
     df = pd.read_csv(file,header = 0,low_memory=False,names = ['id',
                                                                                  'id_type',
                                                                                  'ob_end_time',
@@ -123,6 +162,11 @@ def read_sol_data_full(file):
 
 
 def construct_sol_dict_full(folder):
+    """
+    Constructs dict of yearly solar data dataframes from full MIDAS data
+    :param folder: path to folder containing MIDAS solar .txts
+    :return:
+    """
     all_files = glob.iglob(folder + "/*.txt")
     df_dict = {}
 
@@ -142,20 +186,6 @@ def construct_sol_dict_full(folder):
 
 
 if __name__=='__main__':
-    date = datetime.date(2019,1,1)
-    date2 = datetime.date(2017,1,1)
-    #sol_dict = construct_sol_dict('Solar Data')
-    #pickle.dump(sol_dict, open("sol_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-    file = "Full Solar Data/midas_radtob_200501-200512.txt"
-    #sol_dict = construct_sol_dict_full("Full Solar Data")
-    #pickle.dump(sol_dict, open("full_sol_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-
-    print(get_sol_4_date(date,'Solar Data',False))
-    print(get_sol_4_date_pkl(date))
-
-    print(get_sol_4_date(date2, 'Solar Data', False))
-    print(get_sol_4_date_pkl(date2))
-
-    print(get_sol_4_date_range(date2,date, 'Solar Data', False))
-    print(get_sol_4_date_range_pkl(date2,date))
+    sol_dict = construct_sol_dict_full('Full Solar Data')
+    pickle.dump(sol_dict, open("sol_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
 
