@@ -1,13 +1,21 @@
+"""
+Functions to read COSMOS data csv and get data for given date/date range
+"""
 import numpy as np
 import pandas as pd
 import datetime
 import pickle
 
+
 def get_cosmos_df(csv):
+    """
+    Reads COSMOS data csv into dataframe
+    :param csv: filepath to csv
+    :return:
+    """
     df = pd.read_csv(csv)
     df = df[1:]
     df['DATE_TIME'] = pd.to_datetime(df['DATE_TIME'])
-
     df = df.set_index('DATE_TIME')
     ix = pd.date_range(datetime.date(int(2016), 1, 1), datetime.date(int(2019), 12, 31), freq='D')
     df = df.reindex(ix)
@@ -16,6 +24,14 @@ def get_cosmos_df(csv):
 
 
 def get_cosmos_col_4_date(col,date,csv,pkl = False):
+    """
+    Gets the value of a column from COSMOS csv for a given date
+    :param col: column to get values for
+    :param date: date to get values for
+    :param csv: COSMOS csv file path
+    :param pkl: Bool, if true gets df from .pkl instead of csv
+    :return:
+    """
     if not pkl:
         df = get_cosmos_df(csv)
     else:
@@ -31,11 +47,21 @@ def get_cosmos_col_4_date(col,date,csv,pkl = False):
 
 
 def get_cosmos_col_4_date_range(col,start,end,csv,pkl = False):
+    """
+    Gets the value of a column from COSMOS csv for a given range of dates
+    :param col: column to get values for
+    :param start: start of date range
+    :param end: end of date range
+    :param csv: COSMOS csv file path
+    :param pkl: Bool, if true gets df from .pkl instead of csv
+    :return:
+    """
     if not pkl:
         df = get_cosmos_df(csv)
     else:
         df = pickle.load(open("cosmos_df.pkl", 'rb'))
 
+    # if date range starts and ends in the same year easy to get values
     if start.year == end.year:
 
         cos_arr = df[df['DATE_TIME'].dt.date.between(start,end)][col].to_numpy()
@@ -73,24 +99,28 @@ def get_cosmos_col_4_date_range(col,start,end,csv,pkl = False):
 
 
 def get_cosmos_col_4_date_pkl(col,date):
+    """
+    Gets value of col on date using .pkl
+    :param col: column to get value for
+    :param date: daet to get value for
+    :return:
+    """
     return get_cosmos_col_4_date(col,date,'',True)
 
 
 def get_cosmos_col_4_date_range_pkl(col,start,end):
+    """
+    Gets value of col for date range
+    :param col: col to get value for
+    :param start: start of date range
+    :param end: end of date range
+    :return:
+    """
     return get_cosmos_col_4_date_range(col,start,end,'',True)
 
 
 if __name__ == '__main__':
     csv = "COSMOS-UK_SPENF_HydroSoil_Daily_2013-2019.csv"
 
-    #df = get_cosmos_df(csv)
-    #pickle.dump(df, open("cosmos_df.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-    '''
-    date = datetime.date(3000,8,1)
-
-    start = datetime.date(2016,11,22)
-    end = datetime.date(2017,1,1)
-    #print(get_cosmos_col_4_date('COSMOS_VWC',date,csv))
-    #print(get_cosmos_col_4_date('ALBEDO', date, csv))
-    print(get_cosmos_col_4_date_range('ALBEDO',start,end,csv))
-    '''
+    df = get_cosmos_df(csv)
+    pickle.dump(df, open("cosmos_df.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)

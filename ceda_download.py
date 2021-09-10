@@ -102,10 +102,10 @@ def setup_credentials(username, password,CREDENTIALS_FILE_PATH,TRUSTROOTS_DIR,TR
 
 def download_file(file_url,save_path):
     """
-    Main controller function.
-    :param nc_file_url: URL to a NetCDF4 opendap end-point.
-    :param var_id: Variable ID [String]
-    :return: None
+    Downloads MIDAS file from CEDA and saves it to save_path
+    :param file_url: url of file download
+    :param save_path: save location
+    :return:
     """
     CERTS_DIR = os.path.dirname(os.path.realpath(__file__)) + '/.certs'
 

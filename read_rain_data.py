@@ -1,3 +1,6 @@
+"""
+Reads MIDAS rain data and returns values for given date/date range
+"""
 import numpy as np
 import pandas as pd
 import glob
@@ -5,8 +8,16 @@ import datetime
 import pickle
 from tqdm import tqdm
 
+
 def construct_rain_dicts(csv_folder):
+    """
+    Constructs dictionary of yearly rain dataframes from csvs
+    :param csv_folder: file path to rain data csvs
+    :return:
+    """
+    # daily rain csvs
     all_daily_csvs = glob.iglob(csv_folder + "/Daily/*.csv")
+    # hourly rain csvs
     all_hourly_csvs = glob.iglob(csv_folder + "/Hourly/*.csv")
 
     df_dict = {}
@@ -20,6 +31,7 @@ def construct_rain_dicts(csv_folder):
         hourly_df['ob_end_time'] = pd.to_datetime(hourly_df['ob_end_time'])
         hourly_df = hourly_df.resample('D', on='ob_end_time', ).sum()
 
+        # resamples hourly into daily
         ix = pd.date_range(datetime.date(int(year), 1, 1), datetime.date(int(year), 12, 31), freq='D')
         hourly_df = hourly_df.reindex(ix)
         hourly_df = hourly_df.reset_index(level=0).rename(columns={'index': 'ob_date'})
@@ -43,6 +55,13 @@ def construct_rain_dicts(csv_folder):
 
 
 def get_rain_4_date(date, csv_folder,pkl = False):
+    """
+    Gets daily rain data for given date
+    :param date: date
+    :param csv_folder: file path to rain data csvs
+    :param pkl: Bool, True -> gets dataframes dict from .pkl instead of csvs
+    :return:
+    """
     if not pkl:
         df_dict = construct_rain_dicts(csv_folder)
     else:
@@ -56,11 +75,18 @@ def get_rain_4_date(date, csv_folder,pkl = False):
 
 
 def get_rain_4_date_range(start,end,csv_folder,pkl = False):
+    """
+    Gets rain data for date range [start,end]
+    :param start: start of date range
+    :param end: end of date range
+    :param csv_folder: file path to rain data csvs
+    :param pkl: Bool, True -> gets dataframes dict from .pkl instead of csvs
+    :return:
+    """
     if not pkl:
         df_dict = construct_rain_dicts(csv_folder)
     else:
         df_dict = pickle.load(open("full_rain_dict.pkl", 'rb'))
-
 
     if start.year == end.year:
         try:
@@ -97,15 +123,32 @@ def get_rain_4_date_range(start,end,csv_folder,pkl = False):
         rain_arr = rain_arr[1:]
     return rain_arr
 
+
 def get_rain_4_date_pkl(date):
+    """
+    Gets rain data for date
+    :param date:
+    :return:
+    """
     return get_rain_4_date(date,'',True)
 
+
 def get_rain_4_date_range_pkl(start,end):
+    """
+    Gets rain data for dates in range [start, end]
+    :param start:
+    :param end:
+    :return:
+    """
     return get_rain_4_date_range(start,end,'',True)
 
 
-
 def read_hourly_rain_full(file):
+    """
+    Gets hourly rain data dataframe from full MIDAS yearly .txt
+    :param file: file path to .txt
+    :return:
+    """
     df = pd.read_csv(file,header = 0, low_memory= False,index_col=False,names = ['ob_end_time',
                                                                                'id',
                                                                                'id_type',
@@ -130,8 +173,12 @@ def read_hourly_rain_full(file):
     return df
 
 
-
 def read_daily_rain_full(file):
+    """
+    Gets daily rain data dataframe from full MIDAS yearly .txt
+    :param file: file path to .txt
+    :return:
+    """
     df = pd.read_csv(file,header = 0,low_memory = False, index_col=False, on_bad_lines='skip',names = ['id',
                                                                   'id_type',
                                                                   'ob_date',
@@ -156,6 +203,11 @@ def read_daily_rain_full(file):
 
 
 def construct_rain_dicts_full(full_temp_path):
+    """
+    Constructs dict of yearly rain dataframes from full MIDAS data
+    :param full_temp_path:
+    :return:
+    """
     all_daily_files = glob.iglob(full_temp_path + "/Full Daily/*.txt")
     all_hourly_files = glob.iglob(full_temp_path + "/Full Hourly/*.txt")
 
@@ -185,37 +237,12 @@ def construct_rain_dicts_full(full_temp_path):
             df = df.reset_index(level=0).rename(columns={'index': 'ob_date'})
         df_dict[year] = df
     return df_dict
-    
-    
-    
-    
+
+
 if __name__ == '__main__':
+    rain_dict = construct_rain_dicts_full('Full Rain Data')
+    pickle.dump(rain_dict, open("rain_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
 
-    start = datetime.date(2003,1,1)
-    #print(get_rain_4_date(start,'Rain Data',False))
-    #print(get_rain_4_date(start, '',True))
-    #end = datetime.date(2004,1,1)
-    #print(get_rain_4_date_range(start,end,'Rain Data',False))
-    #print(get_rain_4_date_range(start,end,'',True))
-
-    #print(get_rain_4_date(datetime.date(2003,12,31),'Rain Data',False))
-    #print(get_rain_4_date_pkl(datetime.date(2015,9,1)))
-    #df = read_hourly_rain_full("Full Rain Data/Full Hourly/midas_rainhrly_201501-201512.txt")
-
-    #test = datetime.date(2000,11,1)
-    #print(get_rain_4_date(test,'Rain Data'))
-    #print(np.isnan(get_rain_4_date(test,'Rain Data')))
-
-    #rain_dict = construct_rain_dicts('Rain Data')
-    #pickle.dump(rain_dict, open("rain_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-
-
-
-    #rain_dict = construct_rain_dicts_full('Full Rain Data')
-    #pickle.dump(rain_dict, open("full_rain_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-    #print(rain_dic['1999'])
-    #print(rain_dic['2005'])
-    #print(read_hourly_rain_full("Full Rain Data/Full Hourly/midas_rainhrly_201401-201412.txt"))
     
 
 

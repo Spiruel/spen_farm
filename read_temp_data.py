@@ -1,4 +1,6 @@
-from temp_data_download import download_data
+"""
+Reads MIDAS soil and air temperature data and returns values for given date/date range
+"""
 import numpy as np
 import pandas as pd
 import glob
@@ -8,6 +10,11 @@ from tqdm import tqdm
 
 
 def construct_temp_dicts(csv_folder_path):
+    """
+    Constructs dicts of yearly soil and air temperature dataframes from csvs
+    :param csv_folder_path: path to csvs
+    :return:
+    """
     all_soil_csvs = glob.iglob(csv_folder_path + "/Soil Temp/*.csv")
     all_air_csvs = glob.iglob(csv_folder_path + "/Air Temp/*.csv")
 
@@ -45,11 +52,23 @@ def construct_temp_dicts(csv_folder_path):
 
 
 def daily_soil_temp(date,soil_df):
+    """
+    Returns soil temperature on date
+    :param date: date
+    :param soil_df: soil temp dataframe for year date falls in
+    :return:
+    """
     daily_temp_10_cm_mean = soil_df.loc[pd.to_datetime(soil_df['ob_time']).dt.date == date]['q10cm_soil_temp'].values[0]
     return daily_temp_10_cm_mean
 
 
 def daily_air_temp(date,air_df):
+    """
+    Returns air temperature on data
+    :param date: data
+    :param air_df: air temp dataframe for year date falls in
+    :return:
+    """
     daily_temps_mean = air_df.loc[pd.to_datetime(air_df['ob_end_time']).dt.date == date][['max_air_temp','min_air_temp']]
     max_temp_mean = daily_temps_mean['max_air_temp'].values[0]
     min_temp_mean = daily_temps_mean['min_air_temp'].values[0]
@@ -57,8 +76,14 @@ def daily_air_temp(date,air_df):
 
 
 def get_temps_4_date(date,csv_folder,pkl = False):
+    """
+    returns soil and air temperatures for date
+    :param date: date
+    :param csv_folder: path to data csvs
+    :param pkl: Bool, True -> get dicts from .pkl not csvs
+    :return:
+    """
     if not pkl:
-        download_data(range(1959,2020),csv_folder)
         soil_dict, air_dict = construct_temp_dicts(csv_folder)
     else:
         (soil_dict, air_dict) = pickle.load(open("full_temperature_dict.pkl",'rb'))
@@ -78,13 +103,18 @@ def get_temps_4_date(date,csv_folder,pkl = False):
 
 
 def get_temps_4_date_range(start,end, csv_folder, pkl = False):
+    """
+    returns soil and air temperatures for date range
+    :param start: start of date range
+    :param end: end of date range
+    :param csv_folder: path to data csvs
+    :param pkl: Bool, True -> get dicts from .pkl not csvs
+    :return:
+    """
     if not pkl:
-        download_data(range(1959,2020),csv_folder)
         soil_dict, air_dict = construct_temp_dicts(csv_folder)
     else:
         (soil_dict,air_dict) = pickle.load(open("full_temperature_dict.pkl",'rb'))
-
-    dd = [start + datetime.timedelta(days=x) for x in range((end - start).days + 1)]
 
     if start.year == end.year:
         try:
@@ -141,14 +171,30 @@ def get_temps_4_date_range(start,end, csv_folder, pkl = False):
 
 
 def get_temps_4_date_pkl(date):
+    """
+    Returns temp data for date, getting dfs from .pkl
+    :param date: date
+    :return:
+    """
     return get_temps_4_date(date,'',pkl = True)
 
 
 def get_temps_4_date_range_pkl(start,end):
+    """
+    Returns temp data for date range, getting dfs from .pkl
+    :param start: start of date range
+    :param end: end of date range
+    :return:
+    """
     return get_temps_4_date_range(start,end,'',pkl=True)
 
 
 def read_soil_temp_full(soil_file):
+    """
+    Reads soil temp data into dataframe from full MIDAS .txt
+    :param soil_file: path to file
+    :return:
+    """
     df = pd.read_csv(soil_file, header=0, low_memory = False, names=['id',
                                                 'id_type',
                                                 'ob_time',
@@ -183,6 +229,11 @@ def read_soil_temp_full(soil_file):
 
 
 def read_air_temp_full(air_file):
+    """
+    Reads air temp data from full MIDAS .txt
+    :param air_file: path to file
+    :return:
+    """
     df = pd.read_csv(air_file, header=0, low_memory=False, names=['ob_end_time',
                                                  'id_type',
                                                  'id',
@@ -212,7 +263,13 @@ def read_air_temp_full(air_file):
     df['min_air_temp'] = pd.to_numeric(df['min_air_temp'], errors='coerce')
     return df
 
+
 def construct_temp_dicts_full(full_temp_path):
+    """
+    Constructs dicts of soil and air temperature dataframes from full MIDAS .txts
+    :param full_temp_path: path to .txts
+    :return:
+    """
     all_soil_files = glob.iglob(full_temp_path + "/Full Soil Temp/*.txt")
     all_air_files = glob.iglob(full_temp_path + "/Full Air Temp/*.txt")
 
@@ -246,30 +303,7 @@ def construct_temp_dicts_full(full_temp_path):
 
 
 if __name__ == '__main__':
-    '''
-    test_date = datetime.date(2012,3,20)
-    end = datetime.date(2014,2,6)
-    date1 = datetime.date(2012,2,26)
-
-    start = (end - datetime.timedelta(days=365))
-    print(start,end)
-    #print(get_temps_4_date(start, 'Temperature Data'))
-    #print(get_temps_4_date(end_date, 'Temperature Data'))
-
-    print(get_temps_4_date_range(start,end,'Temperature Data').shape)
-    dd = np.array([start + datetime.timedelta(days=x) for x in range((end - start).days + 1)])
-    print(dd.shape)
-    '''
-    #soil_dict, air_dict = construct_temp_dicts('Temperature Data')
-    #pickle.dump((soil_dict,air_dict),open("temperature_dict.pkl",'wb'),protocol=pickle.HIGHEST_PROTOCOL)
-    #test_date = datetime.date(2019, 1, 1)
-    #test_datee = datetime.date(2019, 1, 10)
-    #print(get_temps_4_date(test_date,'Temperature Data',pkl = True))
-    #print(get_temps_4_date_range(test_date,test_datee,'Temperature Data',pkl = True))
-    #print(read_soil_temp_full("Full Temperature Data/Full Soil Temp/midas_soiltemp_195901-195912.txt"))
-    #df = read_air_temp_full("Full Temperature Data/Full Air Temp/midas_tempdrnl_200501-200512.txt")
     soil_dict, air_dict = construct_temp_dicts_full('Full Temperature Data')
     pickle.dump((soil_dict, air_dict), open("full_temperature_dict.pkl", 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
-    test_date1 = datetime.date(2019,3,2)
-    test_date2 = datetime.date(2021,1,3)
+
 
