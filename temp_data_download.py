@@ -13,7 +13,7 @@ def download_air_temp(year,save_folder):
     download_file(url,save_folder)
 
 
-def download_data(year_range,save_folder):
+def download_temp_data(year_range,save_folder):
     download_soil = True
     download_air = True
 
@@ -36,14 +36,11 @@ def download_data(year_range,save_folder):
             download_air = False
 
     if download_soil or download_air:
-        print("Downloading temperature data", end = '\r')
-        for year in year_range:
+        for year in tqdm(year_range):
             if download_soil:
                 download_soil_temp(year, soil_folder)
             if download_air:
                 download_air_temp(year, air_folder)
-        print("Download finished!", end = '\r')
-        print('                                 ', end = '\r')
 
 
 def download_soil_temp_full(year,save_folder):
