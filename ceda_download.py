@@ -78,7 +78,7 @@ def setup_credentials(username, password,CREDENTIALS_FILE_PATH,TRUSTROOTS_DIR,TR
     #username = os.environ['CEDA_USERNAME']
     #password = os.environ['CEDA_PASSWORD']
     #username = 'zy18811'
-    #password = '***REMOVED***'
+    #password = '**REMOVED**'
 
     onlineca_client = OnlineCaClient()
     onlineca_client.ca_cert_dir = TRUSTROOTS_DIR
@@ -120,7 +120,7 @@ def download_file(file_url,save_path):
     CERT_SERVICE = 'https://slcs.ceda.ac.uk/onlineca/certificate/'
 
     username = 'zy18811'
-    password = '***REMOVED***'
+    password = '**REMOVED**'
 
     try:
         setup_credentials(username,password,CREDENTIALS_FILE_PATH,TRUSTROOTS_DIR,TRUSTROOTS_SERVICE,CERT_SERVICE)
