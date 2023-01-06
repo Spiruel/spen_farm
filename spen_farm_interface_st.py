@@ -1,4 +1,5 @@
 import streamlit as st
+st.title('Spen Farm app')
 
 """
 imports required libraries
@@ -1010,4 +1011,4 @@ interface = spen_farm()
 m = interface.Map
 #m.layout.width = '100%'
 #m.layout.height = '800px'
-m.to_streamlit()
+m.to_streamlit(height=800)
