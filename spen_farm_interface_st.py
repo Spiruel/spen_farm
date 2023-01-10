@@ -5,7 +5,7 @@ st.title('Spen Farm app')
 imports required libraries
 """
 import ee
-ee.Initialize()
+#ee.Initialize()
 import eemont
 import numpy as np
 import matplotlib.pyplot as plt
