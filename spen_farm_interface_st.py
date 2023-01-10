@@ -4,8 +4,6 @@ st.title('Spen Farm app')
 """
 imports required libraries
 """
-import ee
-import eemont
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -19,7 +17,9 @@ import matplotlib.dates as mdates
 import datetime
 
 import geemap.foliumap as geemap
-geemap.ee_initialize()
+import ee
+import eemont
+
 from most_recent_product import field_closest_product_2_date_pkl
 from read_temp_data import get_temps_4_date_pkl,get_temps_4_date_range_pkl
 from read_rain_data import get_rain_4_date_pkl,get_rain_4_date_range_pkl
