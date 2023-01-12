@@ -18,6 +18,7 @@ import datetime
 
 import geemap.foliumap as geemap
 import ee
+ee.Initialize()
 import eemont
 
 from most_recent_product import field_closest_product_2_date_pkl
