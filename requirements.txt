@@ -7,3 +7,5 @@ eemont==0.2.5
 geemap==0.8.18
 leafmap
 Jinja2==3.0.3
+ipython_genutils
+pathlib2
